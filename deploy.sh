@@ -130,7 +130,7 @@ echo "📥 Updating repository..."
 git reset --hard
 
 # Pull latest changes
-git -c http.sslVerify=false pull https://$GITHUB_USER:$GITHUB_TOKEN@github.com/central-bank-libya/fcms.git $BRANCH
+git -c http.sslVerify=false pull https://$GITHUB_USER:$GITHUB_TOKEN@$REPO_URL $BRANCH
 
 echo "✅ Repository updated"
 
