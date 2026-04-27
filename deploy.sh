@@ -135,8 +135,12 @@ if [ "$REPO_URL" = "" ]; then
   exit 1
 fi
 
-# Extract host and repo path
-if [[ "$REPO_URL" == *"github.com"* ]]; then
+# Fix Git URL - remove duplicate https:// and add credentials
+if [[ "$REPO_URL" == *"https://"* ]]; then
+  # Remove https:// from REPO_URL and add it with credentials
+  CLEAN_REPO_URL=$(echo "$REPO_URL" | sed 's|https://||')
+  GIT_REPO_URL="https://$GITHUB_USER:$GITHUB_TOKEN@$CLEAN_REPO_URL"
+elif [[ "$REPO_URL" == *"github.com"* ]]; then
   GIT_REPO_URL="https://$GITHUB_USER:$GITHUB_TOKEN@$REPO_URL"
 else
   # If REPO_URL doesn't include github.com, construct it
