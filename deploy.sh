@@ -114,7 +114,7 @@ echo "  Enabling Maintenance Mode"
 echo "=========================================="
 
 echo "🔧 Enabling maintenance mode..."
-php artisan down --no-interaction --render="errors.updating" --secret="VXhJrHdStlMKsqvuOokdPJ"
+php artisan down --no-interaction --secret="VXhJrHdStlMKsqvuOokdPJ"
 
 # ============================================
 # GIT OPERATIONS (FOURTH)
