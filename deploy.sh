@@ -126,11 +126,30 @@ echo "  Updating Repository"
 echo "=========================================="
 
 echo "📥 Updating repository..."
+echo "Repository: $REPO_URL"
+echo "Branch: $BRANCH"
+
+# Validate REPO_URL
+if [ "$REPO_URL" = "" ]; then
+  echo "❌ ERROR: REPO_URL environment variable is not set"
+  exit 1
+fi
+
+# Extract host and repo path
+if [[ "$REPO_URL" == *"github.com"* ]]; then
+  GIT_REPO_URL="https://$GITHUB_USER:$GITHUB_TOKEN@$REPO_URL"
+else
+  # If REPO_URL doesn't include github.com, construct it
+  GIT_REPO_URL="https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$REPO_URL"
+fi
+
+echo "Git URL: $GIT_REPO_URL"
+
 # Reset any local changes
 git reset --hard
 
 # Pull latest changes
-git -c http.sslVerify=false pull https://$GITHUB_USER:$GITHUB_TOKEN@$REPO_URL $BRANCH
+git -c http.sslVerify=false pull $GIT_REPO_URL $BRANCH
 
 echo "✅ Repository updated"
 
@@ -303,6 +322,7 @@ echo "=========================================="
 echo "  Laravel Deployment Completed Successfully!"
 echo "=========================================="
 echo "Branch: $BRANCH"
+echo "Repository: $REPO_URL"
 echo "Finished at: $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 
