@@ -211,9 +211,12 @@ echo "  Application Reload"
 echo "=========================================="
 
 echo "🚀 Reloading application..."
-php artisan octane:reload
-
-echo "✅ Application reloaded"
+if php artisan list | grep -q "octane"; then
+  php artisan octane:reload
+  echo "✅ Application reloaded via Octane"
+else
+  echo "ℹ️  Octane not installed - skipping reload"
+fi
 
 # ============================================
 # SERVICE MANAGEMENT (User-level)
