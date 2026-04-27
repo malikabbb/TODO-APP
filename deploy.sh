@@ -67,27 +67,63 @@ fi
 echo "✅ Laravel project detected"
 
 # ============================================
-# DEPLOYMENT START
+# ENVIRONMENT SETUP (FIRST)
 # ============================================
 
 echo ""
 echo "=========================================="
-echo "  Starting Laravel Deployment"
-echo "=========================================="
-echo "Branch: $BRANCH"
-echo "Started at: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "  Setting Up Environment"
 echo "=========================================="
 
+# Decrypt environment file first
+if [ -f ".env.encrypted" ]; then
+  echo "🔓 Decrypting environment file..."
+  php artisan env:decrypt --key=$APP_KEY
+  rm .env.encrypted
+  echo "✅ Environment file decrypted"
+else
+  echo "⚠️  No encrypted environment file found"
+  # Create basic .env if not exists
+  if [ ! -f ".env" ]; then
+    echo "📝 Creating basic .env file..."
+    cp .env.example .env 2>/dev/null || echo "APP_NAME=Laravel\nAPP_ENV=local\nAPP_KEY=$APP_KEY\nAPP_DEBUG=true\nAPP_URL=http://localhost" > .env
+  fi
+fi
+
 # ============================================
-# MAINTENANCE MODE
+# DEPENDENCIES INSTALLATION (SECOND)
 # ============================================
+
+echo ""
+echo "=========================================="
+echo "  Installing Dependencies"
+echo "=========================================="
+
+echo "📦 Installing Composer dependencies..."
+composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+echo "✅ Dependencies installed successfully"
+
+# ============================================
+# MAINTENANCE MODE (THIRD)
+# ============================================
+
+echo ""
+echo "=========================================="
+echo "  Enabling Maintenance Mode"
+echo "=========================================="
 
 echo "🔧 Enabling maintenance mode..."
 php artisan down --no-interaction --render="errors.updating" --secret="VXhJrHdStlMKsqvuOokdPJ"
 
 # ============================================
-# GIT OPERATIONS
+# GIT OPERATIONS (FOURTH)
 # ============================================
+
+echo ""
+echo "=========================================="
+echo "  Updating Repository"
+echo "=========================================="
 
 echo "📥 Updating repository..."
 # Reset any local changes
@@ -96,53 +132,74 @@ git reset --hard
 # Pull latest changes
 git -c http.sslVerify=false pull https://$GITHUB_USER:$GITHUB_TOKEN@github.com/central-bank-libya/fcms.git $BRANCH
 
-# ============================================
-# ENVIRONMENT SETUP
-# ============================================
-
-echo "🔓 Setting up environment..."
-# Decrypt environment file
-if [ -f ".env.encrypted" ]; then
-  php artisan env:decrypt --key=$APP_KEY
-  rm .env.encrypted
-  echo "✅ Environment file decrypted"
-else
-  echo "⚠️  No encrypted environment file found"
-fi
-
-# ============================================
-# DEPENDENCIES
-# ============================================
-
-echo "📦 Installing dependencies..."
-composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+echo "✅ Repository updated"
 
 # ============================================
 # LARAVEL CACHE OPTIMIZATIONS
 # ============================================
+
+echo ""
+echo "=========================================="
+echo "  Optimizing Laravel Cache"
+echo "=========================================="
 
 echo "⚡ Optimizing Laravel cache..."
 php artisan route:cache
 php artisan config:cache
 php artisan view:cache
 
+echo "✅ Cache optimized"
+
+# ============================================
+# DATABASE OPERATIONS
+# ============================================
+
+echo ""
+echo "=========================================="
+echo "  Database Operations"
+echo "=========================================="
+
+echo "🗄️  Running database migrations..."
+php artisan migrate --force
+
+echo "✅ Database migrations completed"
+
 # ============================================
 # QUEUE OPERATIONS
 # ============================================
 
+echo ""
+echo "=========================================="
+echo "  Queue Operations"
+echo "=========================================="
+
 echo "🔄 Restarting queues..."
 php artisan queue:restart
+
+echo "✅ Queues restarted"
 
 # ============================================
 # APPLICATION RELOAD
 # ============================================
 
+echo ""
+echo "=========================================="
+echo "  Application Reload"
+echo "=========================================="
+
 echo "🚀 Reloading application..."
 php artisan octane:reload
+
+echo "✅ Application reloaded"
 
 # ============================================
 # SERVICE MANAGEMENT (User-level)
 # ============================================
+
+echo ""
+echo "=========================================="
+echo "  Service Management"
+echo "=========================================="
 
 echo "🔧 Managing services..."
 # Try user-level service restart first
@@ -157,11 +214,18 @@ fi
 php artisan config:cache
 php artisan queue:restart
 
+echo "✅ Service management completed"
+
 # ============================================
 # ENVIRONMENT CLEANUP
 # ============================================
 
-echo "🔒 Securing environment..."
+echo ""
+echo "=========================================="
+echo "  Securing Environment"
+echo "=========================================="
+
+echo "🔒 Encrypting environment file..."
 # Encrypt environment file again
 php artisan env:encrypt --key=$APP_KEY
 rm .env
@@ -171,23 +235,42 @@ echo "✅ Environment file encrypted"
 # MAINTENANCE MODE OFF
 # ============================================
 
+echo ""
+echo "=========================================="
+echo "  Disabling Maintenance Mode"
+echo "=========================================="
+
 echo "🟢 Disabling maintenance mode..."
 php artisan up
+
+echo "✅ Application is live"
 
 # ============================================
 # POST-DEPLOYMENT TASKS
 # ============================================
+
+echo ""
+echo "=========================================="
+echo "  Post-Deployment Tasks"
+echo "=========================================="
 
 echo "🌐 Running post-deployment tasks..."
 # Reload Cloudflare IPs if command exists
 if php artisan list | grep -q "cloudflare"; then
   php artisan cloudflare:reload
   echo "✅ Cloudflare IPs reloaded"
+else
+  echo "ℹ️  Cloudflare not configured - skipping"
 fi
 
 # ============================================
 # FILE PERMISSIONS (User-level)
 # ============================================
+
+echo ""
+echo "=========================================="
+echo "  Setting File Permissions"
+echo "=========================================="
 
 echo "📁 Setting file permissions..."
 # Set permissions for public directory (user-level)
@@ -202,6 +285,13 @@ if [ -d "storage" ]; then
   find storage -type d -exec chmod 775 {} \;
   find storage -type f -exec chmod 664 {} \;
   echo "✅ Storage directory permissions set"
+fi
+
+# Set permissions for bootstrap cache
+if [ -d "bootstrap/cache" ]; then
+  find bootstrap/cache -type d -exec chmod 775 {} \;
+  find bootstrap/cache -type f -exec chmod 664 {} \;
+  echo "✅ Bootstrap cache permissions set"
 fi
 
 # ============================================
@@ -219,9 +309,12 @@ echo ""
 # Show final status
 echo "📊 Final Status:"
 echo "✅ Application is live"
+echo "✅ Dependencies installed"
 echo "✅ Cache optimized"
+echo "✅ Database migrated"
 echo "✅ Queues restarted"
 echo "✅ Environment secured"
+echo "✅ File permissions set"
 echo ""
 
 # Show Laravel version
