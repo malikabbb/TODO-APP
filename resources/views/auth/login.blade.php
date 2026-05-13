@@ -10,12 +10,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .auth-card .login-submit {
-            background: #2563EB;
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+            background: #ffffff;
+            color: #1a1a2e;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         .auth-card .login-submit:hover {
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
     </style>
