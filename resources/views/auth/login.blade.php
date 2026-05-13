@@ -8,6 +8,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .auth-card .login-submit {
+            background: red;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+        }
+        .auth-card .login-submit:hover {
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 <body>
 
@@ -46,7 +57,7 @@
                 <label for="remember" style="font-size:13px;color:#A89EC4;">Remember me</label>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+            <button type="submit" class="btn login-submit" style="width:100%;justify-content:center;">
                 Sign In
             </button>
         </form>
