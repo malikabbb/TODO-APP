@@ -8,18 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        .auth-card .login-submit {
-            background: #ffffff;
-            color: #1a1625;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
-        }
-        .auth-card .login-submit:hover {
-            background: #f3f4f6;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
-            transform: translateY(-1px);
-        }
-    </style>
 </head>
 <body>
 
