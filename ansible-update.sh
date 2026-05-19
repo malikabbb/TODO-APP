@@ -2,7 +2,7 @@
 set -e # exit on first error
 
 # ============================================
-# INPUT VALIDATION step 1
+# INPUT VALIDATION step 1 - test
 # ============================================
 
 if [ "$1" = "" ]; then
