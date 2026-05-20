@@ -46,7 +46,7 @@
                 <label for="remember" style="font-size:13px;color:#A89EC4;">Remember me</label>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+            <button type="submit" class="btn login-submit" style="width:100%;justify-content:center;">
                 Sign In
             </button>
         </form>

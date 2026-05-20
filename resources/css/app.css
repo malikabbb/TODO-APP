@@ -742,6 +742,21 @@ body {
 }
 .auth-footer a:hover { text-decoration: underline; }
 
+.auth-card .login-submit {
+    background-color: #16a34a;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.35);
+}
+.auth-card .login-submit:hover {
+    background-color: #15803d;
+    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.45);
+    transform: translateY(-1px);
+}
+.auth-card .login-submit:focus-visible {
+    outline: 2px solid #86efac;
+    outline-offset: 2px;
+}
+
 /* ─── Misc ──────────────────────────────────────── */
 .divider {
     height: 1px;
