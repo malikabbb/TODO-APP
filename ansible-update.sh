@@ -10,10 +10,9 @@ if [ "$1" = "" ]; then
   exit 1
 fi
 
-if [ "$2" = "" ]; then
-  echo "ERROR: Please set the encryption key"
-  exit 1
-fi
+# APP_KEY ($2) is intentionally optional now: apps that do not use Laravel's
+# encrypted env feature (.env.encrypted) deploy without one. The orchestrator
+# enforces presence/absence based on the per-app `requires_app_key` flag.
 
 if [ "$3" = "" ]; then
   echo "ERROR: Please set the github username"
@@ -26,7 +25,7 @@ if [ "$4" = "" ]; then
 fi
 
 BRANCH="$1"
-APP_KEY="$2"
+APP_KEY="${2:-}"
 GITHUB_USER="$3"
 GITHUB_TOKEN="$4"
 
@@ -83,6 +82,14 @@ echo "  Setting Up Environment"
 echo "=========================================="
 
 if [ -f ".env.encrypted" ]; then
+  # Encrypted env was committed: APP_KEY is mandatory to decrypt it.
+  if [ -z "$APP_KEY" ]; then
+    echo "❌ ERROR: .env.encrypted exists but no APP_KEY was supplied."
+    echo "         Either remove .env.encrypted from the repository or"
+    echo "         enable 'requires_app_key' for this app in the orchestrator."
+    exit 1
+  fi
+
   echo "🔓 Decrypting environment file..."
   # Suppress stdout: env:decrypt prints the encryption key in cleartext.
   if ! php artisan env:decrypt --key="$APP_KEY" >/dev/null 2>&1; then
@@ -92,11 +99,19 @@ if [ -f ".env.encrypted" ]; then
   rm -f .env.encrypted
   echo "✅ Environment file decrypted"
 else
-  echo "⚠️  No encrypted environment file found"
+  # No encrypted env shipped — use whatever .env is on disk, or seed from
+  # .env.example as a last resort. We deliberately do NOT inject APP_KEY into
+  # a generated .env: if the app does not use encrypted env, its APP_KEY is
+  # whatever .env.example / .env defines, not the orchestrator-supplied value.
+  echo "ℹ️  No encrypted environment file found"
   if [ ! -f ".env" ]; then
-    echo "📝 Creating basic .env file..."
-    cp .env.example .env 2>/dev/null || \
-      printf "APP_NAME=Laravel\nAPP_ENV=local\nAPP_KEY=%s\nAPP_DEBUG=true\nAPP_URL=http://localhost\n" "$APP_KEY" > .env
+    if [ -f ".env.example" ]; then
+      echo "📝 Seeding .env from .env.example..."
+      cp .env.example .env
+    else
+      echo "❌ ERROR: Neither .env nor .env.example present in the repository."
+      exit 1
+    fi
   fi
 fi
 
@@ -271,14 +286,18 @@ echo "=========================================="
 echo "  Securing Environment"
 echo "=========================================="
 
-echo "🔒 Encrypting environment file..."
-# Suppress stdout: env:encrypt prints the encryption key in cleartext.
-if ! php artisan env:encrypt --key="$APP_KEY" >/dev/null 2>&1; then
-  echo "❌ Failed to encrypt environment file"
-  exit 1
+if [ -n "$APP_KEY" ]; then
+  echo "🔒 Encrypting environment file..."
+  # Suppress stdout: env:encrypt prints the encryption key in cleartext.
+  if ! php artisan env:encrypt --key="$APP_KEY" >/dev/null 2>&1; then
+    echo "❌ Failed to encrypt environment file"
+    exit 1
+  fi
+  rm -f .env
+  echo "✅ Environment file encrypted"
+else
+  echo "ℹ️  Skipping env:encrypt (no APP_KEY supplied — app does not use encrypted env)"
 fi
-rm -f .env
-echo "✅ Environment file encrypted"
 
 # ============================================
 # MAINTENANCE MODE OFF
@@ -358,7 +377,9 @@ echo "✅ Dependencies installed"
 echo "✅ Cache optimized"
 echo "✅ Database migrated"
 echo "✅ Queues restarted"
-echo "✅ Environment secured"
+if [ -n "$APP_KEY" ]; then
+  echo "✅ Environment secured"
+fi
 echo "✅ File permissions set"
 echo ""
 
