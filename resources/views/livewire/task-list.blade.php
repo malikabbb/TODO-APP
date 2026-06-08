@@ -37,7 +37,7 @@
                  id="task-{{ $task->id }}">
 
                 {{-- Drag handle --}}
-                <div style="color:#6B6489;cursor:grab;flex-shrink:0;">
+                <div class="task-drag-handle">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <circle cx="9" cy="6" r="2"/><circle cx="15" cy="6" r="2"/>
                         <circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/>
@@ -72,7 +72,7 @@
                         @endif
                         <span class="priority-badge {{ $task->priority }}">{{ $task->priority }}</span>
                         @if($task->description)
-                            <span style="font-size:11px;color:#6B6489">· {{ Str::limit($task->description, 40) }}</span>
+                            <span class="task-description-preview">· {{ Str::limit($task->description, 40) }}</span>
                         @endif
                     </div>
                 </div>
