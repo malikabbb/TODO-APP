@@ -12,7 +12,16 @@
 
     {{-- User section --}}
     <div style="display:flex;align-items:center;gap:12px;position:relative;" x-data="{ open: false }">
-        <span style="font-size:13px;color:#A89EC4;">{{ Auth::user()->name }}</span>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch theme">
+            <svg class="theme-toggle-icon theme-toggle-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+            <svg class="theme-toggle-icon theme-toggle-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+        </button>
+        <span style="font-size:13px;color:var(--theme-text-secondary);">{{ Auth::user()->name }}</span>
         <div class="avatar-btn" @click="open=!open" @click.outside="open=false">
             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
         </div>

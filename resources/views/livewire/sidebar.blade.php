@@ -57,14 +57,14 @@
     </a>
 
     {{-- Footer --}}
-    <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(124,58,237,0.1);">
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;">
-            <div style="width:36px;height:36px;background:linear-gradient(135deg,#7C3AED,#8B5CF6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar">
                 {{ strtoupper(substr($user->name, 0, 1)) }}
             </div>
             <div>
-                <div style="font-size:13px;font-weight:600;color:#F1F0FF;">{{ $user->name }}</div>
-                <div style="font-size:11px;color:#6B6489;">{{ $user->email }}</div>
+                <div class="sidebar-user-name">{{ $user->name }}</div>
+                <div class="sidebar-user-email">{{ $user->email }}</div>
             </div>
         </div>
     </div>
